@@ -12,6 +12,9 @@ SP = "|$|"
 
 host = "0.0.0.0" #服务器地址
 port = 18679 #端口
+
+allMessage = ''
+
 print("[Server]服务器：",host)
 print("[Server]端口:",port)
 StartNewServer = False #设定主线程启动新服务器为禁用
@@ -30,7 +33,7 @@ def recvMessage():
 
 
 
-            def GetLoginUserName():
+            def GetLoginUserName(): #获取当前登录用户信息
                 
                 try:
                     with open(r'./Users/' + aback[2] , "r") as f: #阅读账户文件
@@ -43,9 +46,12 @@ def recvMessage():
             
 
 
-
-
-
+            def sendAllMessage():
+                global allMessage
+                serversocket.send(allMessage.encode('gbk'))
+                
+                
+            
             
             if len(aback) >= 2:
                 if aback[0] == "Login"and len(aback) =5: #当收到登录请求时
@@ -54,9 +60,15 @@ def recvMessage():
 
                     if aback[2] == userName and aback[3] == userPassword:#如果密码符合则
                         onlineUser.append(aback[1] + SP +aback[4])
-                elif aback[0] == "newMessage" and len(aback)>=5:
+                        print("新用户,"aback[1] ,"连接，登记IP地址".aback[4])
+                        
+                elif aback[0] == "newMessage" and len(aback)>=6:
                     
-                    
+                    GetLoginUserName()
+                    if aback[2] == userName and aback[3] == userPassword:
+                        serversocket.send(allMessage())
+                        
+                        
 
 StartServerListen()
 #主循环
@@ -71,6 +83,7 @@ while True:
     try:
         #添加连接用户到列表
         onlineUserIP.append(str(addr))
+        _thread.start_new_thread(recvMessage,())
         
         
     except Exception as q:
